@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Weekly high-protein meal prep plans with a Walmart-ready grocery list and Samsung Food recipe pages.">
+<title>Protein Prep Week</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: sticky control bar, a stats strip, then four tabbed panels. Kitchen-tile neutrals, one green accent. */
+  :root {
+    --bg: #f4f6f3; --surface: #ffffff; --surface-2: #e9eee8; --line: #d3dbd1;
+    --fg: #16211a; --fg-2: #4b5a50; --fg-3: #7b8a80;
+    --accent: #1e7a58; --accent-ink: #ffffff; --accent-soft: #dcefe4;
+    --pro: #b4461a; --pro-soft: #fae4d9;
+    --font-display: 'Bricolage Grotesque', 'Arial Narrow', sans-serif;
+    --font-body: 'Instrument Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0f1512; --surface: #171f1a; --surface-2: #202b24; --line: #2f3c33;
+    --fg: #e9eee8; --fg-2: #b4c0b7; --fg-3: #7f8d84;
+    --accent: #4fc08f; --accent-ink: #0b1a12; --accent-soft: #1b3328;
+    --pro: #f0905f; --pro-soft: #3a2418; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg: #0f1512; --surface: #171f1a; --surface-2: #202b24; --line: #2f3c33;
+    --fg: #e9eee8; --fg-2: #b4c0b7; --fg-3: #7f8d84;
+    --accent: #4fc08f; --accent-ink: #0b1a12; --accent-soft: #1b3328;
+    --pro: #f0905f; --pro-soft: #3a2418; color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; margin: 0; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+  h1 { font-size: 1.35rem; font-weight: 800; }
+  h2 { font-size: 1.9rem; font-weight: 800; line-height: 1.1; }
+  h3 { font-size: 1.15rem; font-weight: 700; }
+  h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+  h4 small { color: var(--fg-3); font-weight: 500; font-family: var(--font-body); }
+  p { margin: 0; }
+  a { color: var(--accent); }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-3); font-weight: 600; }
+  .dim { color: var(--fg-3); }
+  .pro { color: var(--pro); font-weight: 600; }
+
+  /* control bar */
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .bar-in { max-width: 1100px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+  .brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto; }
+  .brand span { color: var(--fg-3); font-size: 0.8rem; }
+  .weeknav { display: flex; align-items: center; gap: 6px; }
+  .weeknav .lbl { display: flex; flex-direction: column; min-width: 150px; text-align: center; line-height: 1.2; }
+  .weeknav .lbl b { font-family: var(--font-display); font-size: 1rem; }
+  .weeknav .lbl small { color: var(--fg-3); font-size: 0.72rem; }
+  .ctl { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--fg-2); }
+  .stepper { display: inline-flex; align-items: center; gap: 2px; font-size: 0.8rem; color: var(--fg-2); }
+  .stepper button, .iconbtn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; line-height: 1; }
+  .stepper button:hover, .iconbtn:hover { background: var(--surface-2); }
+  .stepper output { min-width: 22px; text-align: center; font-family: var(--font-mono); font-size: 0.9rem; color: var(--fg); }
+  select { font: inherit; font-size: 0.85rem; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 6px; padding: 4px 6px; }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
+  .btn:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; color: var(--accent); }
+  .btn.ghost:hover { background: var(--accent-soft); }
+  .btn.sm { padding: 5px 10px; font-size: 0.78rem; }
+  .btn.big { padding: 12px 20px; font-size: 1rem; }
+  .btn.disabled { opacity: 0.45; pointer-events: none; }
+
+  /* hero + stats */
+  .hero { padding-block: 26px 16px; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+  .hero p { color: var(--fg-2); max-width: 60ch; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 22px; }
+  .stat { background: var(--surface); padding: 12px 14px; display: flex; flex-direction: column; min-width: 0; }
+  .stat-l { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-3); font-weight: 600; }
+  .stat-v { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .stat-s { font-size: 0.75rem; color: var(--fg-3); }
+
+  /* tabs */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 20px; overflow-x: auto; }
+  .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 14px; cursor: pointer; font-weight: 600; color: var(--fg-2); white-space: nowrap; margin-bottom: -1px; }
+  .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+  .section-h { margin: 22px 0 10px; }
+  .section-h:first-child { margin-top: 0; }
+
+  /* calendar */
+  .calendar { display: grid; grid-template-columns: 84px repeat(5, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 0.8rem; }
+  .cal-head, .cal-row, .cell { background: var(--surface); padding: 8px 10px; min-width: 0; }
+  .cal-head { font-weight: 700; font-family: var(--font-display); }
+  .cal-head small { color: var(--fg-3); font-weight: 500; font-family: var(--font-body); }
+  .cal-row { font-weight: 600; color: var(--fg-2); background: var(--surface-2); }
+  .cell { display: flex; flex-direction: column; gap: 2px; }
+  .cell-name { overflow-wrap: anywhere; }
+  .cell-p { font-family: var(--font-mono); color: var(--pro); font-size: 0.75rem; }
+  .cal-scroll { overflow-x: auto; margin-bottom: 22px; }
+  @media (max-width: 640px) { .calendar { min-width: 640px; } }
+
+  /* cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
+  .recipe { margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .recipe header { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+  .card-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .macros { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--fg-2); font-variant-numeric: tabular-nums; }
+  .macros b { font-family: var(--font-mono); font-weight: 500; color: var(--fg); }
+  .macros .pro b { color: var(--pro); }
+  .recipe-body { display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 18px; }
+  @media (max-width: 640px) { .recipe-body { grid-template-columns: 1fr; } }
+  .ings, .steps { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
+  .ings .q { font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-2); display: inline-block; min-width: 74px; }
+  .steps { counter-reset: s; }
+  .steps li { padding-left: 26px; position: relative; }
+  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 0.7rem; font-weight: 700; display: grid; place-items: center; }
+  .recipe-foot { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+
+  .snacks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px; }
+  .snacks li { display: flex; justify-content: space-between; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 0.88rem; }
+
+  /* grocery */
+  .order { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 760px) { .order { grid-template-columns: 1fr; } }
+  .order .card { display: flex; flex-direction: column; gap: 10px; }
+  .order .card p { font-size: 0.88rem; color: var(--fg-2); }
+  .order ol { margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--fg-2); display: flex; flex-direction: column; gap: 3px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .status { font-size: 0.8rem; color: var(--fg-3); }
+  .field { display: flex; flex-direction: column; gap: 4px; font-size: 0.78rem; color: var(--fg-3); }
+  .field input { font: inherit; font-size: 0.85rem; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; width: 100%; }
+  .aisle { margin-bottom: 18px; }
+  .aisle h3 { margin-bottom: 8px; }
+  .aisle h3 small { font-family: var(--font-body); font-weight: 500; color: var(--fg-3); font-size: 0.78rem; }
+  .aisle ul { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+  .g-row { display: grid; grid-template-columns: auto 1fr auto; gap: 8px 14px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); }
+  .g-row:first-child { border-top: 0; }
+  .g-row.muted .g-main { opacity: 0.45; text-decoration: line-through; }
+  .chk { display: flex; flex-direction: column; align-items: center; font-size: 0.65rem; color: var(--fg-3); gap: 2px; width: 46px; }
+  .chk input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+  .g-main { display: flex; flex-direction: column; min-width: 0; }
+  .g-name { font-weight: 600; }
+  .g-sub { font-size: 0.78rem; color: var(--fg-2); overflow-wrap: anywhere; }
+  .g-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .wm-id { font: inherit; font-size: 0.78rem; width: 150px; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); border-radius: 6px; padding: 5px 7px; }
+  .linked { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-3); padding: 2px 6px; border-radius: 999px; background: var(--surface-2); }
+  .linked.on { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  @media (max-width: 640px) { .g-row { grid-template-columns: auto 1fr; } .g-links { grid-column: 1 / -1; justify-content: flex-start; } }
+
+  /* prep */
+  .prep-block { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .prep-block:first-child { border-top: 0; }
+  .prep-n { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; }
+  .prep-block p { color: var(--fg-2); font-size: 0.9rem; margin-bottom: 8px; }
+  .prep-block ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  .prep-block li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; }
+  .prep-block .n { color: var(--fg-3); font-family: var(--font-mono); font-size: 0.78rem; }
+
+  .note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: var(--fg-2); margin: 16px 0; }
+  #toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 8px 16px; border-radius: 999px; font-size: 0.85rem; z-index: 20; }
+  #copy-fallback { width: 100%; min-height: 120px; font: inherit; font-size: 0.8rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); padding: 8px; margin-top: 10px; }
+  footer.site { margin-top: 40px; font-size: 0.78rem; color: var(--fg-3); border-top: 1px solid var(--line); padding-top: 14px; }
+  @media (prefers-reduced-motion: no-preference) { .btn, .stepper button { transition: background 0.15s, filter 0.15s; } }
+</style>
+
+
+<style>body{margin:0}</style>
+</head>
+<body>
+<div class="bar">
+  <div class="bar-in">
+    <div class="brand"><h1>Protein Prep Week</h1><span>high-protein, low-effort, ordered from Walmart</span></div>
+    <div class="weeknav">
+      <button type="button" class="iconbtn" data-act="week" data-d="-1" aria-label="Previous week">‹</button>
+      <div class="lbl"><b id="week-label">This week</b><small id="week-dates"></small></div>
+      <button type="button" class="iconbtn" data-act="week" data-d="1" aria-label="Next week">›</button>
+      <button type="button" class="btn ghost sm" data-act="today">Today</button>
+    </div>
+    <label class="ctl stepper">People
+      <button type="button" data-act="people" data-d="-1" aria-label="Fewer people">−</button>
+      <output id="people-out">1</output>
+      <button type="button" data-act="people" data-d="1" aria-label="More people">+</button>
+    </label>
+    <label class="ctl" for="variety">Dinners to cook
+      <select id="variety">
+        <option value="2">2 recipes, eat each 2–3×</option>
+        <option value="3">3 recipes, eat each ~2×</option>
+        <option value="5">5 recipes, one per night</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div><p class="eyebrow">This week's menu</p><h2 id="week-name"></h2><p id="week-blurb"></p></div>
+    <button type="button" class="btn ghost sm" data-act="reset-week">Reset this week's edits</button>
+  </div>
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab="plan" aria-selected="true">Plan</button>
+    <button type="button" role="tab" data-tab="recipes" aria-selected="false">Recipes</button>
+    <button type="button" role="tab" data-tab="grocery" aria-selected="false">Grocery &amp; order</button>
+    <button type="button" role="tab" data-tab="prep" aria-selected="false">Prep day</button>
+  </div>
+
+  <section class="panel" id="tab-plan">
+    <div class="cal-scroll"><div class="calendar" id="calendar"></div></div>
+    <div id="plan-cards"></div>
+    <h3 class="section-h">Snacks to keep on hand</h3>
+    <ul class="snacks" id="snacks"></ul>
+    <div class="note">Every dinner lands between 38 and 60 g protein per serving and needs 25 minutes or less of hands-on time. Use Swap on any card to cycle through the other recipes; servings and swaps are saved per week in this browser.</div>
+  </section>
+
+  <section class="panel" id="tab-recipes" hidden>
+    <div class="row" style="margin-bottom:16px">
+      <button type="button" class="btn" id="all-links" data-act="copy" data-text="">Copy all recipe links for Samsung Food</button>
+      <span class="status">In Samsung Food: Saved → + → Save recipe link → paste one link at a time.</span>
+    </div>
+    <div id="recipe-list"></div>
+  </section>
+
+  <section class="panel" id="tab-grocery" hidden>
+    <div class="order">
+      <div class="card">
+        <h3>Order on Walmart</h3>
+        <p>One-click cart fill uses Walmart's add-to-cart hand-off link. It needs Walmart's item ID for each product, so the first time through, click <b>Find on Walmart</b>, pick the product you like, and paste its page link into the box. The site saves the ID and reuses it every week.</p>
+        <div class="row"><a class="btn big disabled" id="wm-cart" href="#grocery" target="_blank" rel="noopener">Add week to Walmart cart</a>
+          <button type="button" class="btn ghost" id="copy-list" data-act="copy" data-text="">Copy list by aisle</button></div>
+        <span class="status" id="wm-status"></span>
+        <p class="dim">Walmart opens with the items in your cart; you still review quantities and check out there.</p>
+      </div>
+      <div class="card">
+        <h3>Send to Samsung Food</h3>
+        <p>Samsung Food (and the Family Hub fridge) can order a shopping list through Walmart or Instacart. Two ways to get this week in there:</p>
+        <ol>
+          <li><b>Recipes:</b> copy the recipe links, then in Samsung Food go to Saved → + → Save recipe link. Each page carries recipe markup so ingredients import cleanly. Add them to the Samsung Food shopping list and tap Shop → Walmart.</li>
+          <li><b>List only:</b> copy the list as one item per line and add the lines to a Samsung Food shopping list.</li>
+        </ol>
+        <div class="row">
+          <button type="button" class="btn" id="sf-links" data-act="copy" data-text="">Copy recipe links</button>
+          <button type="button" class="btn ghost" id="copy-list-lines" data-act="copy" data-text="">Copy list, one per line</button>
+        </div>
+        <label class="field" for="base-url">Where the recipe pages are published (GitHub Pages URL of this repo's <code>recipes/</code> folder)
+          <input type="url" id="base-url" value="">
+        </label>
+      </div>
+    </div>
+    <div id="grocery"></div>
+    <textarea id="copy-fallback" hidden aria-label="Text to copy"></textarea>
+  </section>
+
+  <section class="panel" id="tab-prep" hidden>
+    <div class="note">Order of operations for one prep session. Slow cooker and grains go first because they run unattended; sheet pans share the oven; cold assembly closes it out.</div>
+    <div id="prep"></div>
+  </section>
+
+  <footer class="site">Macros are estimates per serving based on typical USDA values and the listed brands; swap in your own products' labels for precision. Pack sizes reflect common Walmart Great Value sizes and may differ by store.</footer>
+</div>
+<div id="toast" hidden role="status"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
