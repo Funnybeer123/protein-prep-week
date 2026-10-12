@@ -1,6 +1,8 @@
 /* Protein Prep Week — app logic. Depends on data.js (window DATA). */
 (() => {
   const { catalog, recipes, weeks, snacks } = DATA;
+  const LBL = (typeof LABELS !== 'undefined' && LABELS) || {};
+  const macrosOf = (r) => NUTRITION.recipeMacros(r, catalog, LBL);
   const byId = Object.fromEntries(recipes.map(r => [r.id, r]));
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -93,8 +95,14 @@
   const cartLink = (items) => items.length ? 'https://affil.walmart.com/cart/addToCart?items=' + items.map(i => i.id + '|' + i.qty).join(',') : '';
 
   // ---------- render helpers ----------
-  const macroStrip = (n, label) => `<div class="macros" aria-label="${esc(label || 'per serving')}">
-    <span><b>${n[0]}</b> kcal</span><span class="pro"><b>${n[1]}g</b> protein</span><span><b>${n[2]}g</b> carbs</span><span><b>${n[3]}g</b> fat</span></div>`;
+  const macroStrip = (r) => {
+    const m = macrosOf(r); const n = m.n;
+    const badge = m.source === 'label'
+      ? `<span class="badge ok" title="Computed from each ingredient's Nutrition Facts${m.usda ? `; ${m.usda} unpackaged item${m.usda > 1 ? 's' : ''} use USDA data` : ''}">from labels</span>`
+      : `<span class="badge" title="${esc(m.missing.length ? 'No label yet for: ' + m.missing.join(', ') : 'Estimated')}">estimate · ${m.labeled}/${m.total} labeled</span>`;
+    return `<div class="macros" aria-label="per serving">
+    <span><b>${n[0]}</b> kcal</span><span class="pro"><b>${n[1]}g</b> protein</span><span><b>${n[2]}g</b> carbs</span><span><b>${n[3]}g</b> fat</span>${badge}</div>`;
+  };
 
   const recipeCard = (s, compact) => {
     const r = s.r;
@@ -115,7 +123,7 @@
           <button type="button" class="btn ghost" data-act="swap">Swap</button>
         </div>
       </header>
-      ${macroStrip(r.n)}
+      ${macroStrip(r)}
       ${compact ? '' : `<div class="recipe-body">
         <div><h4>Ingredients <small>for ${s.servings}</small></h4><ul class="ings">${ings}</ul></div>
         <div><h4>Steps</h4><ol class="steps">${r.steps.map(t => `<li>${esc(t)}</li>`).join('')}</ol></div>
@@ -130,7 +138,7 @@
 
   const recipeText = (s) => {
     const r = s.r;
-    const lines = [r.name, `Serves ${s.servings} · ${r.n[1]}g protein / ${r.n[0]} kcal per serving`, '', 'Ingredients:'];
+    const m = macrosOf(r).n; const lines = [r.name, `Serves ${s.servings} · ${m[1]}g protein / ${m[0]} kcal per serving`, '', 'Ingredients:'];
     for (const [k, q] of r.ing) { const c = catalog[k]; const v = q * s.f; lines.push(`- ${fmtQty(v)} ${unitLabel(c.unit, v)} ${c.name}`.replace(/\s+/g, ' ')); }
     lines.push('', 'Steps:'); r.steps.forEach((t, i) => lines.push(`${i + 1}. ${t}`));
     return lines.join('\n');
@@ -146,8 +154,8 @@
     $('#people-out').textContent = state.people;
     $('#variety').value = String(state.variety);
 
-    const avg = (arr) => arr.reduce((a, s) => a + s.r.n[1], 0) / arr.length;
-    const avgK = (arr) => arr.reduce((a, s) => a + s.r.n[0], 0) / arr.length;
+    const avg = (arr) => arr.reduce((a, s) => a + macrosOf(s.r).n[1], 0) / arr.length;
+    const avgK = (arr) => arr.reduce((a, s) => a + macrosOf(s.r).n[0], 0) / arr.length;
     const protein = Math.round(avg(p.breakfasts) + avg(p.lunches) + avg(p.dinners) + 22);
     const kcal = Math.round(avgK(p.breakfasts) + avgK(p.lunches) + avgK(p.dinners) + 180);
     const active = allSlots(p).reduce((a, s) => a + s.r.active, 0);
@@ -155,7 +163,7 @@
     const g = grocery(p);
     $('#stats').innerHTML = [
       ['protein / day', `${protein} g`, 'with one snack'],
-      ['calories / day', `${kcal}`, 'estimate'],
+      ['calories / day', `${kcal}`, allSlots(p).every(s => macrosOf(s.r).source === 'label') ? 'from labels' : 'estimate'],
       ['recipes to cook', `${allSlots(p).length}`, `${p.dinners.length} dinners · 2 breakfasts · 2 lunches`],
       ['prep day', `≈${Math.floor(prepMin / 60)}h ${prepMin % 60}m`, 'hands-on, overlapping'],
       ['grocery list', `${g.filter(x => !x.item.staple).length} items`, `${g.filter(x => x.item.staple).length} pantry staples`],
@@ -165,7 +173,7 @@
   const renderPlan = (p) => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     const mon = weekMonday();
-    const cell = (s) => `<div class="cell"><span class="cell-name">${esc(s.r.name)}</span><span class="cell-p">${s.r.n[1]}g</span></div>`;
+    const cell = (s) => `<div class="cell"><span class="cell-name">${esc(s.r.name)}</span><span class="cell-p">${macrosOf(s.r).n[1]}g</span></div>`;
     $('#calendar').innerHTML = `<div class="cal-head"></div>` + days.map((d, i) => { const dt = new Date(mon); dt.setDate(dt.getDate() + i); return `<div class="cal-head">${d} <small>${fmtDate(dt)}</small></div>`; }).join('')
       + ['Breakfast', 'Lunch', 'Dinner'].map((m, row) => `<div class="cal-row">${m}</div>` + days.map((_, i) => {
         const list = row === 0 ? p.breakfasts : row === 1 ? p.lunches : p.dinners;
@@ -193,13 +201,16 @@
       groups[a].map(r => {
         const id = state.wmIds[r.item.key] || '';
         const need = fmtQty(r.qty) + ' ' + unitLabel(r.item.unit, r.qty);
+        const L = LBL[r.item.key];
+        const prod = L && L.source === 'Branded' ? `<span class="g-prod">${esc((L.brand ? L.brand + ' ' : '') + L.description.toLowerCase())}${L.upc ? ` · UPC ${esc(L.upc)}` : ''}</span>` : '';
+        const wmq = L && L.upc ? L.upc.replace(/^0+/, '') : r.item.query;
         const checked = r.item.staple ? !!o.need[r.item.key] : !!o.have[r.item.key];
         return `<li class="g-row ${inCart(r) ? '' : 'muted'}" data-key="${r.item.key}">
           <label class="chk"><input type="checkbox" id="chk-${r.item.key}" data-act="${r.item.staple ? 'need' : 'have'}" ${checked ? 'checked' : ''}><span>${r.item.staple ? 'need it' : 'have it'}</span></label>
           <div class="g-main"><span class="g-name">${esc(r.item.name)}</span>
-            <span class="g-sub">${r.packs} × ${esc(r.item.packLabel)} <span class="dim">(need ${need.trim()})</span> · ${esc([...new Set(r.recipes)].join(', '))}</span></div>
+            <span class="g-sub">${r.packs} × ${esc(r.item.packLabel)} <span class="dim">(need ${need.trim()})</span> · ${esc([...new Set(r.recipes)].join(', '))}</span>${prod}</div>
           <div class="g-links">
-            <a class="btn ghost sm" href="${walmartSearch(r.item.query)}" target="_blank" rel="noopener">Find on Walmart</a>
+            <a class="btn ghost sm" href="${walmartSearch(wmq)}" target="_blank" rel="noopener">${L && L.upc ? 'Exact item on Walmart' : 'Find on Walmart'}</a>
             <input type="text" class="wm-id" id="wm-${r.item.key}" placeholder="paste product link" value="${esc(id)}" aria-label="Walmart item ID for ${esc(r.item.name)}" data-act="wmid">
             <span class="linked ${id ? 'on' : ''}" title="${id ? 'Linked to item ' + id : 'Not linked yet'}">${id ? 'linked' : 'not linked'}</span>
           </div></li>`;

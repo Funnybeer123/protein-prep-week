@@ -8,6 +8,9 @@ import { dirname, join } from 'node:path';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = createRequire(import.meta.url)(join(root, 'data.js'));
 const fragment = readFileSync(join(root, 'src/page.html'), 'utf8');
+const LABELS = JSON.parse(readFileSync(join(root, 'labels.json'), 'utf8'));
+const NUTRITION = createRequire(import.meta.url)(join(root, 'nutrition.js'));
+writeFileSync(join(root, 'labels.js'), 'const LABELS = ' + JSON.stringify(LABELS) + ';\n');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const doc = (body, extraHead = '') => `<!doctype html>
@@ -45,14 +48,15 @@ const unit = (u, q) => ({ cup: q === 1 ? 'cup' : 'cups', each: '', clove: q === 
 mkdirSync(join(root, 'recipes'), { recursive: true });
 const mealLabel = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
 for (const r of DATA.recipes) {
+  const M = NUTRITION.recipeMacros(r, DATA.catalog, LABELS); const n = M.n;
   const ings = r.ing.map(([k, q]) => `${fmt(q)} ${unit(DATA.catalog[k].unit, q)} ${DATA.catalog[k].name}`.replace(/\s+/g, ' ').trim());
   const ld = {
     '@context': 'https://schema.org', '@type': 'Recipe', name: r.name,
-    description: `High-protein ${r.meal}: ${r.n[1]} g protein and ${r.n[0]} kcal per serving. ${r.tags.join(', ')}.`,
+    description: `High-protein ${r.meal}: ${n[1]} g protein and ${n[0]} kcal per serving${M.source === 'label' ? ' (from ingredient labels)' : ' (estimate)'}. ${r.tags.join(', ')}.`,
     recipeYield: `${r.baseServings} servings`, recipeCategory: mealLabel[r.meal], recipeCuisine: 'American',
     keywords: ['high protein', 'meal prep', ...r.tags].join(', '),
     prepTime: `PT${Math.max(5, r.active - 5)}M`, cookTime: `PT${Math.max(0, r.time - Math.max(5, r.active - 5))}M`, totalTime: `PT${r.time}M`,
-    nutrition: { '@type': 'NutritionInformation', servingSize: '1 serving', calories: `${r.n[0]} calories`, proteinContent: `${r.n[1]} g`, carbohydrateContent: `${r.n[2]} g`, fatContent: `${r.n[3]} g` },
+    nutrition: { '@type': 'NutritionInformation', servingSize: '1 serving', calories: `${n[0]} calories`, proteinContent: `${n[1]} g`, carbohydrateContent: `${n[2]} g`, fatContent: `${n[3]} g` },
     recipeIngredient: ings,
     recipeInstructions: r.steps.map((t, i) => ({ '@type': 'HowToStep', position: i + 1, text: t })),
     author: { '@type': 'Organization', name: 'Protein Prep Week' },
@@ -68,6 +72,7 @@ for (const r of DATA.recipes) {
   .meta { color: var(--fg-2); font-size: 0.9rem; margin-bottom: 18px; }
   .macros { display:flex; flex-wrap:wrap; gap: 6px 16px; font-size: 0.9rem; margin-bottom: 20px; }
   .macros b.pro { color: var(--pro); }
+  .macros .src { color: var(--fg-2); font-size: 0.8rem; }
   h2 { font-size: 1.1rem; margin: 20px 0 8px; }
   ul, ol { padding-left: 20px; margin: 0; }
   li { margin-bottom: 4px; }
@@ -80,7 +85,7 @@ for (const r of DATA.recipes) {
   <a class="back" href="../index.html#recipes">← Protein Prep Week</a>
   <h1>${esc(r.name)}</h1>
   <p class="meta">${mealLabel[r.meal]} · serves ${r.baseServings} · ${r.time} min total, ${r.active} min hands-on · ${esc(r.tags.join(' · '))}</p>
-  <div class="macros"><span><b>${r.n[0]}</b> kcal</span><span><b class="pro">${r.n[1]} g</b> protein</span><span><b>${r.n[2]} g</b> carbs</span><span><b>${r.n[3]} g</b> fat</span></div>
+  <div class="macros"><span><b>${n[0]}</b> kcal</span><span><b class="pro">${n[1]} g</b> protein</span><span><b>${n[2]} g</b> carbs</span><span><b>${n[3]} g</b> fat</span><span class="src">${M.source === 'label' ? 'from ingredient labels' : 'estimate'}</span></div>
   <h2>Ingredients</h2>
   <ul>${ings.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
   <h2>Steps</h2>

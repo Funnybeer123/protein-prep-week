@@ -106,6 +106,9 @@
   .macros { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--fg-2); font-variant-numeric: tabular-nums; }
   .macros b { font-family: var(--font-mono); font-weight: 500; color: var(--fg); }
   .macros .pro b { color: var(--pro); }
+  .badge { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--fg-3); font-weight: 600; cursor: help; }
+  .badge.ok { background: var(--accent-soft); color: var(--accent); }
+  .g-prod { font-size: 0.74rem; color: var(--fg-3); overflow-wrap: anywhere; }
   .recipe-body { display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 18px; }
   @media (max-width: 640px) { .recipe-body { grid-template-columns: 1fr; } }
   .ings, .steps { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem; }
@@ -255,11 +258,13 @@
     <div id="prep"></div>
   </section>
 
-  <footer class="site">Macros are estimates per serving based on typical USDA values and the listed brands; swap in your own products' labels for precision. Pack sizes reflect common Walmart Great Value sizes and may differ by store.</footer>
+  <footer class="site">Macros marked <b>from labels</b> are computed from each ingredient's filed Nutrition Facts (USDA FoodData Central branded data, matched by UPC) and the recipe's gram weights; fresh produce uses USDA reference data. Anything marked <b>estimate</b> has not been pulled yet. Pack sizes reflect common Walmart sizes and may differ by store.</footer>
 </div>
 <div id="toast" hidden role="status"></div>
 
 <script src="data.js"></script>
+<script src="labels.js"></script>
+<script src="nutrition.js"></script>
 <script src="app.js"></script>
 
 </body>
