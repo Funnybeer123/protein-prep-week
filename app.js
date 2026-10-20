@@ -32,7 +32,7 @@
     offset: 0,                           // weeks from today
     people: store.get('people', 1),
     variety: store.get('variety', 3),    // number of dinner recipes to cook
-    baseUrl: store.get('baseUrl', 'https://funnybeer123.github.io/protein-prep-week/recipes/'),
+    baseUrl: store.get('baseUrl', 'https://protein-prep-week.azurewebsites.net/recipes/'),
     wmIds: store.get('wmIds', {}),
     tab: 'plan',
   };
